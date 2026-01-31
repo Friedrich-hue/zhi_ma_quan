@@ -10,15 +10,10 @@ export default {
 	},
 	navBar: { // 顶部导航
 		logo: '/static/logo.png', // 左侧 Logo
+		// 管理端只启用中文（不提供切换）
 		langs: [{
 			text: '中文简体',
 			lang: 'zh-Hans'
-		}, {
-			text: '中文繁體',
-			lang: 'zh-Hant'
-		}, {
-			text: 'English',
-			lang: 'en'
 		}],
 		themes: [{
 			text: '默认',

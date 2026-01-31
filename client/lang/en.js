@@ -1,5 +1,6 @@
 export default {
-	tabbar:'List,Grid,contacts,Mine',
+	// 注意：tabbar 文案数量需与 pages.json 的 tabBar 数量一致（当前为 3 个）
+	tabbar:'List,Grid,Mine',
 	agreementsTitle:'User service agreement,Privacy policy',
 	common: {
 		wechatFriends: "friends",

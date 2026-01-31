@@ -49,8 +49,8 @@
 					</view>
 				</view>
 
-				<!-- 语言选择器 -->
-				<view class="navbar-right-item-gap" style="position: relative;" :class="{'popup-menu': langMenuOpened}">
+				<!-- 语言选择器（管理端仅在配置了多语言时显示） -->
+				<view v-if="langs && langs.length > 1" class="navbar-right-item-gap" style="position: relative;" :class="{'popup-menu': langMenuOpened}">
 					<view class="lang-selector" @click="toggleLangMenu">
 						<view class="admin-icons-lang" />
 						<uni-icons class="arrowdown" type="arrowdown" color="#666" size="13"></uni-icons>

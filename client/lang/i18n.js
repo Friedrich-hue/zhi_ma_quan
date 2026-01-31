@@ -14,6 +14,8 @@ if(i18nEnable){
 }
 // console.log(uni.getStorageSync('CURRENT_LANG'),currentLang);
 if (!currentLang) {
+	// 兜底，保证同步有值（避免部分端 getSystemInfo 异步导致 locale 为空）
+	currentLang = 'zh-Hans'
 	if (uni.getLocale) {
 		console.log('获取应用语言:', uni.getLocale());
 		let language = 'en'

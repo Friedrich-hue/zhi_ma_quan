@@ -21,7 +21,7 @@ export default {
 	//关于应用
 	"about": {
 		//应用名称
-		"appName": "uni-starter",
+		"appName": "知马圈",
 		//应用logo
 		"logo": "/static/logo.png",
 		//公司名称

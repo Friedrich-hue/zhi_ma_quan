@@ -8,16 +8,21 @@
 ### 本阶段交付物
 - 用户端页面：**首页（含 Banner 轮播 + 商品列表）**、商品详情、购物车、结算页、地址管理、订单列表/详情（待支付）
 - 管理端页面：**Banner 管理**、商品新增/编辑/上下架、订单列表/详情（只读即可）
-- 数据结构：`banners`、`products`、`user_addresses`、`orders`、`order_items`（含必要索引）
-- 接口/云函数：**Banner 读取与管理**、商品读取、地址 CRUD、订单创建/查询
+- 数据结构：`opendb-banner`（系统集合）、`products`、`user_addresses`、`orders`、`order_items`（含必要索引）
+- 接口/云函数：商品读取、地址 CRUD、订单创建/查询（Banner 读取/管理复用 `opendb-banner` 的 DB Schema 与通用 CRUD）
 
 ### 开发范围
 
 - **首页 Banner（运营位）**
-  - 用户端：首页顶部轮播组件，展示上架 Banner，按权重排序
-  - 管理端：Banner CRUD（图片上传、跳转配置、排序、上下架）
-  - 跳转类型：无跳转 / 内部跳转（商品/分类/活动页）/ 外部链接
-  - 时效控制（可选）：`start_at` / `end_at` 生效时间范围
+  - 统一使用系统集合：`opendb-banner`
+  - 用户端：首页顶部轮播组件（swiper），只展示 `status=true` 的 Banner
+  - 排序：按 `sort` 升序（数值越小越靠前）
+  - （可选）栏目隔离：使用 `category_id` 区分（例如首页固定 `category_id="home"`）
+  - 点击跳转：使用 `open_url`
+    - 外部链接：`http://` / `https://`（用 web-view 打开）
+    - 内部页面：以 `/`、`./`、`@/` 开头的页面路径（用 `navigateTo` 跳转）
+    - 无跳转：`open_url` 为空
+  - 备注：`opendb-banner` 默认不含 `start_at/end_at` 生效期字段；若后续需要“按时间自动上下架”，再评审是否扩展字段或改为自定义集合
 
 - **商品（MVP）**
   - 列表/详情读取
@@ -91,17 +96,14 @@
 
 ### 数据结构建议（增量字段）
 
-- `banners`（新增）
-  - `title`：标题（内部标识，用户端可选展示）
-  - `image_url`：图片地址（云存储/CDN）
-  - `link_type`：跳转类型 `none/internal/external`
-  - `link_path`：内部跳转路径（如 `/pages/product/detail?id=xxx`）
-  - `link_url`：外部跳转链接
-  - `sort_order`：排序权重（数值越大越靠前，默认 0）
-  - `status`：状态 `on/off`
-  - `start_at`：生效开始时间（可选，null 表示立即生效）
-  - `end_at`：生效结束时间（可选，null 表示永久有效）
-  - `created_at`、`updated_at`、`created_by`
+- `opendb-banner`（系统集合，直接复用）
+  - `bannerfile`：图片文件（`file` 类型，使用 `bannerfile.url` 展示）
+  - `open_url`：点击目标地址（外部链接或内部页面路径）
+  - `title`：标题（内部标识；用户端可选展示）
+  - `sort`：排序（数字越小越靠前）
+  - `status`：生效状态（bool，true/false）
+  - `category_id`：分类/栏目 id（可选，用于区分不同页面/栏位的 Banner）
+  - `description`：备注（维护者自用）
 
 - `products`
   - 核心：`name`、`desc`、`images[]`、`spec_text`、`origin_price`、`sale_price`、`status(on/off)`
@@ -122,13 +124,9 @@
 
 ### 接口/云函数清单（示例）
 
-**Banner 相关**
-- `banner.list`：用户端获取有效 Banner 列表（只返回上架 + 在有效期内的 Banner，按 `sort_order` 降序）
-- `admin.banners.list`：管理端 Banner 列表（支持筛选状态）
-- `admin.banners.create`：新增 Banner（图片上传到云存储后传入 URL）
-- `admin.banners.update`：编辑 Banner
-- `admin.banners.delete`：删除 Banner
-- `admin.banners.set_status`：上下架 Banner
+**Banner 相关（统一复用 `opendb-banner`）**
+- 用户端：使用 `unicloud-db` 组件直接查询 `opendb-banner`（过滤 `status=true`，可选 `category_id="home"`，按 `sort` 升序）
+- 管理端：基于 `opendb-banner` 的 DB Schema 使用通用 CRUD（新增/编辑/删除/上下架/排序）
 
 **商品相关**
 - `catalog.products.list`：分页商品列表（只返回上架商品）
@@ -148,7 +146,7 @@
 - **客户端（H5）**
   - **首页 Banner 轮播**
     - swiper 轮播组件（自动播放、指示器、手势滑动）
-    - 点击跳转逻辑：根据 `link_type` 处理 none/internal/external
+    - 点击跳转逻辑：根据 `open_url` 判断外链/内页/空
     - 空态处理：无 Banner 时隐藏轮播区域
     - 图片懒加载与占位（可选优化）
   - 商品列表/详情（含多语言 UI 文案适配）
@@ -158,10 +156,9 @@
   - 订单页：列表/详情（待支付状态）
 
 - **后端（UniCloud）**
-  - **Banner 接口**
-    - `banner.list`：返回有效 Banner（status=on + 在有效期内），按 `sort_order` 降序
-    - 管理端 CRUD 接口：create/update/delete/set_status
-    - 图片上传：复用云存储上传能力
+  - **Banner（opendb-banner）**
+    - 本阶段不新增自定义 Banner 云函数：用户端用 `unicloud-db` 查询；管理端用通用 CRUD
+    - 图片上传：使用 `opendb-banner.bannerfile`（file 类型）上传并存储
   - 商品读取接口：按 `status` 过滤、分页
   - 地址 CRUD：只能操作自己的地址（鉴权）
   - 订单创建：金额重算（含运费规则）、快照落库、幂等处理、生成 `order_no`
@@ -170,7 +167,7 @@
 - **管理端**
   - **Banner 管理**
     - 列表页：展示所有 Banner（缩略图、标题、状态、排序、操作）
-    - 新增/编辑：图片上传（拖拽/选择）、跳转配置（类型+路径/URL）、排序权重、有效期
+    - 新增/编辑：图片上传（`bannerfile`）、跳转地址（`open_url`）、排序（`sort`）、状态（`status`）、栏目（`category_id` 可选）
     - 上下架：快捷操作
     - 删除：二次确认
     - （可选）拖拽排序

@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+
+# 知马圈
+当前项目主要聚焦于马来西亚工薪阶层日常生活交付服务以及社区生活服务，例如在线订水，后期拓展到在线话费充值、电费充值等。
+
+## 规范
+代码用snake_case style
+通用模块按需封装
+代码优雅、高效
+项目高可扩展、高可维护性、高模块化
+关键部位简洁注释
+避免过多层级嵌套
+
+### 页面结构规范
+以用户动态activity的页面为例：
+/pages/activity/list: 列表页
+/pages/activity/detail: 详情页
+/pages/activity/create_or_edit：根据id区分是创建还是编辑数据，不要分成两个页面。
+
+## 技术栈
+vue2：前端语言
+uniapp：多端编译
+uni-starter: uniapp的快速开发框架，[文档地址](https://doc.dcloud.net.cn/uniCloud/uni-starter.html)
+unicloud：后端的数据库及云函数，[文档地址](https://doc.dcloud.net.cn/uniCloud/)
+unicloud database 数据库扩展触发器钩子：DB Schema扩展js [文档地址](https://doc.dcloud.net.cn/uniCloud/jql-schema-ext.html)
+
+### 数据结构
+用户体系主要基于unicloud的uni-id，它还包含了前端的通用页面uni-id-pages，[文档地址](https://doc.dcloud.net.cn/uniCloud/uni-id/summary.html)
+
+
+## 注意
+编写代码时，根据通用的级别不同，在相应目录里封装函数、样式、组件等以使项目更简洁
+优先使用通用组件库，尽量避免重复造轮子
+

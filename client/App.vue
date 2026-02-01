@@ -6,6 +6,7 @@
 	// #endif
 	import checkIsAgree from '@/pages/uni-agree/utils/uni-agree.js';
 	import uniIdPageInit from '@/uni_modules/uni-id-pages/init.js';
+	import { initCartBadge } from '@/services/cart_service';
 	export default {
 		globalData: {
 			searchText: '',
@@ -20,6 +21,9 @@
 			this.globalData.$t = str => this.$t(str)
 			initApp();
 			uniIdPageInit()
+			
+			// 初始化购物车角标
+			initCartBadge()
 			
 			// #ifdef APP
 			//checkIsAgree(); APP端暂时先用原生默认生成的。目前，自定义方式启动vue界面时，原生层已经请求了部分权限这并不符合国家的法规

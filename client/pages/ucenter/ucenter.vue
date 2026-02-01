@@ -78,6 +78,16 @@
 				],
 				ucenterList: [
 					[
+						{
+							"title": "My Orders",
+							"to": '/pages/order/order-list',
+							"icon": "paperplane"
+						},
+						{
+							"title": "My Addresses",
+							"to": '/pages/address/address-list',
+							"icon": "location"
+						},
 						// #ifdef APP-PLUS
 						{
 							"title": this.$t('mine.signInByAd'),

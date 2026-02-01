@@ -77,40 +77,36 @@
 
 - 首页顶部轮播组件（swiper）
 - 支持图片展示 + 点击跳转（内部页面/外部链接）
-- 仅展示上架状态的 Banner，按排序权重展示
+- 统一使用系统集合：`opendb-banner`
+- 仅展示 `status=true` 的 Banner，按 `sort` 升序展示（数值越小越靠前）
 - 空态处理：无 Banner 时隐藏轮播区域或展示默认占位
 
 #### 5.0.2 Banner 管理（管理端）
 
-- **新增/编辑 Banner**
-  - 图片上传（建议尺寸/比例约束，如 750×300 或 2.5:1）
-  - 跳转链接（`link_type`：`none`/`internal`/`external`）
-  - 内部跳转：商品详情、分类页、活动页等（`link_path`）
-  - 外部跳转：完整 URL（`link_url`）
-  - 排序权重（`sort_order`，数值越大越靠前）
-  - 上下架状态（`status`：`on`/`off`）
-  - 生效时间范围（可选）：`start_at`、`end_at`
+- **新增/编辑 Banner（opendb-banner）**
+  - 图片上传（建议尺寸/比例约束，如 750×300 或 2.5:1）：存入 `bannerfile`（file）
+  - 点击跳转：`open_url`
+    - 外部跳转：完整 URL（`http://` / `https://`，用户端用 web-view 打开）
+    - 内部跳转：本地页面路径（如 `/pages/product-detail/product-detail?id=xxx`）
+  - 排序：`sort`（数值越小越靠前）
+  - 上下架状态：`status`（bool，true/false）
+  - （可选）栏目隔离：`category_id`（例如首页固定 `home`）
 - **上下架**：快捷操作
-- **排序**：支持拖拽或权重调整
+- **排序**：支持拖拽或数值调整（对应 `sort`）
 - **预览**：编辑时可预览效果（可选）
 
-#### 5.0.3 Banner 数据结构（建议）
+#### 5.0.3 Banner 数据结构（opendb-banner）
 
 ```
-banners
+opendb-banner
 ├── _id
-├── title              // Banner 标题（内部标识，用户端可选展示）
-├── image_url          // 图片地址（云存储/CDN）
-├── link_type          // 跳转类型：none/internal/external
-├── link_path          // 内部跳转路径（如 /pages/product/detail?id=xxx）
-├── link_url           // 外部跳转链接
-├── sort_order         // 排序权重（数值越大越靠前）
-├── status             // 状态：on/off
-├── start_at           // 生效开始时间（可选）
-├── end_at             // 生效结束时间（可选）
-├── created_at
-├── updated_at
-└── created_by         // 创建人（管理员 ID）
+├── bannerfile         // 图片文件（file；使用 bannerfile.url 展示）
+├── open_url           // 点击目标地址（外部 URL 或内部页面路径；为空则不跳转）
+├── title              // 标题（内部标识；用户端可选展示）
+├── sort               // 排序（数字越小越靠前）
+├── status             // 生效状态（bool）
+├── category_id        // 分类/栏目 id（可选）
+└── description        // 备注（维护者自用）
 ```
 
 ### 5.1 商品展示（用户端）

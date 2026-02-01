@@ -44,6 +44,7 @@
 ### 数据结构（Phase 01 只建骨架/最小字段）
 - `uni-id-users`：复用 uni-id
 - `admin_users`（或使用 uni-id + role 字段）：管理端权限
+- `opendb-banner`（系统集合）：首页 Banner 轮播（Phase 02 落地，Phase 01 可先同步建表/初始化数据）
 - `products`（骨架）：`name`、`price`、`status`、`cover_image` + 库存预留字段
   - 预留：`stock_mode`、`stock_qty`、`warehouse_id`
 - `user_addresses`（骨架）：`user_id`、`name`、`phone_optional`、`address_line`、`state`、`postcode`
